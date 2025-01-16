@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <form id="upload-form" action="/upload" enctype="multipart/form-data">
+      <label for="auth-token">Token:</label>
+      <input type="text" id="auth-token" name="auth-token" placeholder="***" required/>
+      <input type="file" id="file-input" name="file" accept=".csv" required/>
+      <input type="submit" value="Upload">
+    </form>
+    <p id="status"></p>
+    <script src="/script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,22 @@
+[package]
+name = "voiper"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.8.1", features = ["multipart", "ws"] }
+axum-macros = "0.5.0"
+base64 = "0.22.1"
+clap = { version = "4.5.23", features = ["derive"] }
+csv = "1.3.1"
+dotenv = "0.15.0"
+futures-util = "0.3.31"
+hound = "3.5.1"
+hyper = "1.5.2"
+reqwest = "0.12.12"
+serde = { version = "1.0.217", features = ["serde_derive"] }
+serde_json = "1.0.135"
+tokio = { version = "1.42.0", features = ["full"] }
+tower-http = { version = "0.6.2", features = ["fs"] }
+urlencoding = "2.1.3"
+whisper-rs = "0.13.2"
