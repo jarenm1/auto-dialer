@@ -1,17 +1,8 @@
 use core::f32;
 use std::collections::HashMap;
-use std::io::Read;
-use std::time::{Duration, Instant};
 use axum::extract::ws::{Message, WebSocket};
-use futures_util::{SinkExt, StreamExt};
+use futures_util::StreamExt;
 use serde::{Deserialize, Serialize};
-
-use base64::{Engine as _, engine::general_purpose::STANDARD as base64};
-use tokio::process;
-use whisper_rs::{FullParams, WhisperContext, WhisperContextParameters, WhisperState};
-
-use crate::generate_response::{self, llm_response};
-use crate::utils;
 
 #[derive(Deserialize)]
 struct Start {
@@ -101,6 +92,8 @@ enum TwilioMessage {
     },
 }
 
+
+//not used because no message is being send back yet
 #[derive(Serialize)]
 enum TwilioResponse {
     #[serde(rename = "media")]
@@ -122,9 +115,11 @@ enum TwilioResponse {
     }
 }
 
+//no concurrency currently
+//only allows for 1 call at a time
 pub async fn handle_socket(mut socket: WebSocket) {
     let (mut sender, mut reciever) = socket.split();
-    let mut audio_vector: Vec<i16> = Vec::new();
+    let mut mulaw_data: Vec<u8> = Vec::new();
 
     while let Some(Ok(message)) = reciever.next().await {
         match message {
@@ -136,45 +131,42 @@ pub async fn handle_socket(mut socket: WebSocket) {
                         match twilio_msg {
                             TwilioMessage::ConnectedMessage { protocol, version } => {
                                 println!("Connected, protocol: {}, version: {}", protocol, version);
+                                //some dashboard logic here maybe
+                                //https://www.twilio.com/docs/voice/media-streams/websocket-messages#connected-message
                             },
                             TwilioMessage::StartMessage { sequence_number, start } => {
                                 println!("Started connection; streamSid: {}, sequence_number: {}, callSid: {}", start.stream_sid, sequence_number, start.call_sid);
+                                //https://www.twilio.com/docs/voice/media-streams/websocket-messages#start-message
                             },
                             TwilioMessage::MediaMessage { sequence_number, media, stream_sid } => {
-                                //collect audio data into vec, send vec when the person stops
-                                //talking
-                                //
-                                let bytes = base64.decode(media.payload).unwrap();
-                                
-                                for byte in bytes {
-                                    println!("{}", byte);
-                                    if byte < 250 {
-                                        audio_vector.push(byte.into());
-                                    }
-                                }
-                                
+                                //https://www.twilio.com/docs/voice/media-streams/websocket-messages#media-message
+                                // write audio stuff
+                                todo!()
                                 
                             },
                             TwilioMessage::DtmfMessage { stream_sid, sequence_number, dtmf } => {
                                 println!("Digit: {}, pressed from {}, streamSid: {}, sequenceNumber: {}", dtmf.digit, dtmf.track, stream_sid, sequence_number);
+                                // nothing needed here for now
+                                // https://www.twilio.com/docs/voice/media-streams/websocket-messages#dtmf-message
                             },
                             TwilioMessage::MarkMessage { stream_sid, sequence_number, mark } => {
                                 println!("Message finished playing: {}, streamSid: {}, sequenceNumber: {}", mark.name, stream_sid, sequence_number);
-
+                                //https://www.twilio.com/docs/voice/media-streams/websocket-messages#mark-message
+                                //sends after audio is completed.
+                                //
                             },
                             TwilioMessage::StopMessage { stream_sid } => {
                                 println!("{} stopped", stream_sid);
-                                write_wav_file(&audio_vector);
+                                //https://www.twilio.com/docs/voice/media-streams/websocket-messages#stop-message
+                                //end message
+
                             }
                         }
-
-
                     }
                     Err(e) => {
                         eprintln!("Error parsing twilio message: {}", e);
                     }
                 }
-                
             }
             Message::Close(_) => {
                 println!("Client disconnected");
@@ -183,24 +175,5 @@ pub async fn handle_socket(mut socket: WebSocket) {
             _ => {}
         }
     }
-}
-
-fn write_wav_file(samples: &[i16]) -> Result<(), hound::Error> {
-
-    let spec = hound::WavSpec {
-        bits_per_sample: 16,
-        channels: 1,
-        sample_format: hound::SampleFormat::Int,
-        sample_rate: 8000,
-    };
-
-    let mut writer = hound::WavWriter::create("newwave.wav", spec)?;
-
-    for &sample in samples {
-        writer.write_sample(sample)?;
-    }
-
-    writer.finalize()?;
-    Ok(())
 }
 

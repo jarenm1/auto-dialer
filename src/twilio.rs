@@ -3,6 +3,7 @@ use std::error::Error;
 
 use crate::utils;
 
+//call error handling
 pub enum CallReponse {
     ClientError,
     Success,
@@ -14,8 +15,11 @@ pub async fn prep_twilio(file_path: String) {
     let records: Vec<String> = utils::read_csv(&file_path).unwrap();
 
     for to_number in records {
+        //currently routes to my voip ws 
+        //needs to be changed later
         let twiml = (r#"<Response><Connect><Stream name="Test" url="wss://voip.jarenmchugh.com/ws" /></Connect></Response>"#).to_string();
 
+        //need to add better error handling later 
         match make_call(&to_number, &from_number, &twiml).await {
             Ok(CallReponse::Success) => println!("Call to {} successful", to_number),
             Ok(CallReponse::ClientError) => println!("Client error to: {}", to_number),
@@ -25,6 +29,9 @@ pub async fn prep_twilio(file_path: String) {
 }
 
 async fn make_call(to: &str, from: &str, twiml: &str) -> Result<CallReponse, Box<dyn Error>> {
+    
+    // need to change this later
+    // currently takes from .env
     let account_sid = std::env::var("ACCOUNT_SID").expect("account sid expected");
     let auth_token = std::env::var("AUTH_TOKEN").expect("auth token expected");
 

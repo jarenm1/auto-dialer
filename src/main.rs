@@ -12,7 +12,6 @@ use dotenv::dotenv;
 use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 
-mod generate_response;
 mod twilio;
 mod upload;
 mod utils;
