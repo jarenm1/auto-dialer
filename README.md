@@ -5,10 +5,10 @@
 
 env has 4 values:
 
-ACCOUNT_SID is the twilio account sid
-AUTH_TOKEN is the twilio auth token
-FROM_NUMBER is the twilio from number
-VALID_TOKEN is the 'token' that must match the token provided from the upload frontend
+1. ACCOUNT_SID is the twilio account sid
+2. AUTH_TOKEN is the twilio auth token
+3. FROM_NUMBER is the twilio from number
+4. VALID_TOKEN is the 'token' that must match the token provided from the upload frontend
 
 ## Requirements
 
