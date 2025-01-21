@@ -1,5 +1,6 @@
 # README
 
+in src/twilio.rs there is [twiml](https://www.twilio.com/docs/voice/twiml/stream) that needs to be changed. Currently links to where I was hosting the websocket for twiml. 
 
 ## how to env
 
