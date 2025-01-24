@@ -1,18 +1,14 @@
 # README
 
-Uses twilio because it was the first voip provider I found. 
+Uses vonage api now.
 
-# !!!
-in src/twilio.rs there is [twiml](https://www.twilio.com/docs/voice/twiml/stream) that needs to be changed. Currently links to where I was hosting the websocket for twiml. 
+Vonage wont let me make an account so I cant test it. Missing vonage JWT token support.
 
 ## how to env
 
-env has 4 values:
+env has 1 working value now:
 
-1. ACCOUNT_SID is the twilio account sid
-2. AUTH_TOKEN is the twilio auth token
-3. FROM_NUMBER is the twilio from number
-4. VALID_TOKEN is the 'token' that must match the token provided from the upload frontend
+1. URI = websocket server link
 
 ## Requirements
 
