@@ -11,7 +11,7 @@ pub enum CallReponse {
 
 pub async fn prep_twilio(file_path: String) {
     let from_number = std::env::var("FROM_NUMBER").expect("from number expected in env");
-
+    
     let records: Vec<String> = utils::read_csv(&file_path).unwrap();
 
     for to_number in records {
@@ -26,6 +26,7 @@ pub async fn prep_twilio(file_path: String) {
             Err(e) => eprintln!("Error making call: {}", e),
         }
     }
+    
 }
 
 async fn make_call(to: &str, from: &str, twiml: &str) -> Result<CallReponse, Box<dyn Error>> {

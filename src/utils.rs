@@ -1,7 +1,6 @@
 use csv::Reader;
 use std::error::Error;
 
-
 //csv opener
 //has no error handling
 pub fn read_csv(file_path: &str) -> Result<Vec<String>, Box<dyn Error>> {

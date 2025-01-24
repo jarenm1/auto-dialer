@@ -3,19 +3,15 @@ use axum::{extract::Multipart, response::IntoResponse};
 use dotenv::dotenv;
 use std::env;
 use tokio::io::AsyncWriteExt;
-
-use crate::twilio;
+use crate::vonage;
 
 pub async fn upload_handler(headers: HeaderMap, mut multipart: Multipart) -> impl IntoResponse {
     dotenv().ok();
-    let valid_token = env::var("VALID_TOKEN").unwrap();
 
-    if let Some(token) = headers.get("Authorization") {
-        println!("Recieved token: {}", token.to_str().unwrap());
+    if let Some(number) = headers.get("Number") {
+        let from_number = number.to_str().expect("Work").to_string();
+        println!("{}", from_number);
 
-        if token.to_str().unwrap() != valid_token {
-            return (StatusCode::UNAUTHORIZED, "Invalid token".to_string());
-        }
 
         let mut file_name = String::new();
         let mut file_data = Vec::new();
@@ -42,7 +38,8 @@ pub async fn upload_handler(headers: HeaderMap, mut multipart: Multipart) -> imp
                 .unwrap();
             file.write_all(&file_data).await.unwrap();
             println!("Uploaded file: {}, size: {}", file_name, file_data.len());
-            twilio::prep_twilio(file_name).await;
+            let uri = env::var("URI").unwrap();
+            vonage::call::prep_call(file_name, from_number, uri).await;
             return (StatusCode::OK, "File uploaded successfully!".to_string());
         }
 

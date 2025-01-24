@@ -1,5 +1,6 @@
 use axum::extract::WebSocketUpgrade;
-use axum::response::Response;
+use axum::extract::connect_info::ConnectInfo;
+use axum::response::IntoResponse;
 use axum::routing::{get_service, post};
 use axum::{routing::any, Router};
 
@@ -16,10 +17,11 @@ mod twilio;
 mod upload;
 mod utils;
 mod ws_twilio;
+mod vonage;
 
 #[debug_handler]
-async fn ws_handler(ws: WebSocketUpgrade) -> Response {
-    ws.on_upgrade(ws_twilio::handle_socket)
+async fn ws_handler(ws: WebSocketUpgrade, ConnectInfo(addr): ConnectInfo<std::net::SocketAddr> ) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| vonage::websocket::handle_socket(socket, addr))
 }
 
 #[tokio::main]

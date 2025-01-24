@@ -7,8 +7,8 @@ form.addEventListener('submit', async (event) => {
   const fileInput = document.getElementById('file-input');
   const file = fileInput.files[0];
 
-  const tokenInput = document.getElementById('auth-token');
-  const token = tokenInput.value;
+  const numberInput = document.getElementById('number');
+  const number = numberInput.value;
 
   const formData = new FormData();
   formData.append('file', file);
@@ -18,7 +18,7 @@ form.addEventListener('submit', async (event) => {
       method: 'POST',
       body: formData,
       headers: {
-        'Authorization': `${token}`,
+        'Number': `${number}`,
       }
     });
 
